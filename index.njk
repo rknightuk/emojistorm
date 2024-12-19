@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <title>EmojiStorm</title>
+
+    <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="shortcut icon" href="/assets/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+
+    <meta property="og:title" content="EmojiStorm">
+    <meta property="og:url" content="https://emojistorm.rknight.me">
+    <meta name="description" content="So many emoji">
+    <meta property="og:description" content="So many emoji">
+    <meta property="og:image" content="https://emojistorm.rknight.me/assets/preview.jpg">
+    <meta name="fediverse:creator" content="@robb@social.lol">
+
+    <meta name="theme-color" content="#1098ad">
+
+    <style>
+
+        :root {
+            --text: #f1f3f5;
+            --bg: #343a40;
+            --primary: #1098ad;
+        }
+
+        html {
+            font-family: system-ui, sans-serif;
+            font-weight: normal;
+            font-size: 1.2em;
+            max-width: 40rem;
+            padding: 1rem;
+            margin: auto;
+            line-height: 1.5rem;
+            background-color: var(--bg);
+            text-align: center;
+            color: var(--text);
+        }
+
+        footer {
+            font-size: 0.9em;
+            text-transform: lowercase;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration-thickness: 2px;
+            text-underline-offset: 3px;
+        }
+
+        a:hover {
+            text-decoration: none;
+        }
+
+        button {
+            font-size: 1.2em;
+            box-shadow: none;
+            border: none;
+            padding: 5px 10px;
+            background-color: var(--primary);
+            color: white;
+            letter-spacing: 2px;
+        }
+
+        .options {
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        button:hover {
+            cursor: pointer;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 10px;
+        }
+    </style>
+
+    <script type="module" src="/assets/snow-fall.js"></script>
+</head>
+
+<body>
+
+    <snow-fall text="❄️" count="500"></snow-fall>
+
+    <h1>EmojiStorm</h1>
+
+    <div class="options">
+        {% for cat in categories %}
+            <div>
+                <input type="radio" id="{{ cat.slug }}" name="type" value="{{ cat.slug }}">
+                <label for="{{ cat.slug }}">{{ cat.name }}</label>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="buttons">
+        <button onclick="more()">one emoji please</button>
+        <button onclick="reset()" style="display: none;" id="reset">reset</button>
+    </div>
+
+    <footer>
+        <p>a <a href="https://rknight.me">Robb Knight</a> curio<br>built with <a href="https://11ty.dev">11ty</a> and <a href="https://www.zachleat.com/web/snow-fall/"><code>snow-fall</code></p>
+    </footer>
+
+    <script>
+        const emoji = {{ emoji | dump | safe }}
+        let clicks = 0
+        const messages = [
+            ...Array(5).fill('reset please'),
+            ...Array(5).fill('okay that was fun but reset'),
+            ...Array(5).fill('hmmm yep need to reset'),
+            ...Array(5).fill('okay this is too many emoji, abort '),
+            ...Array(10).fill('omg reset it before the emoji take me'),
+            ...Array(5).fill('robb why did you build this'),
+        ]
+
+        function more() {
+            clicks++
+            let type = document.querySelector('input[name="type"]:checked')?.value
+            if (!type) {
+                type = Object.keys(emoji)[Math.floor(Math.random()*Object.keys(emoji).length)]
+            }
+
+            document.getElementById('reset').style.display = 'block'
+            document.getElementById('reset').innerText = messages[clicks] || 'well this just silly now'
+        
+            const random = emoji[type][Math.floor(Math.random()*emoji[type].length)]
+
+            newSnowFall(random)
+        }
+
+        function reset() {
+            clicks = 0
+            document.getElementById('reset').style.display = 'none'
+            document.querySelectorAll('snow-fall').forEach(e => e.remove())
+
+            newSnowFall('❄️')
+        }
+
+        function newSnowFall(emoji) {
+            const more = document.createElement('snow-fall')
+            more.setAttribute('text', emoji)
+            document.body.appendChild(more)
+        }
+    </script>
+</body>
+
+</html>
